@@ -43,7 +43,7 @@ std::shared_ptr<ov::Model> create_simple_model(const std::string save_path) {
 }
 
 std::shared_ptr<ov::Model> create_dynamic_model(const std::string save_path) {
-    ov::PartialShape shape({1, 3, 22, ov::Dimension::dynamic()});
+    ov::PartialShape shape({ov::Dimension::dynamic(), 2});
     ov::element::Type type(ov::element::Type_t::f32);
     auto param = std::make_shared<ov::op::v0::Parameter>(type, shape);
     param->get_output_tensor(0).set_names({"tensor"});
@@ -72,8 +72,8 @@ std::shared_ptr<ov::Model> create_dynamic_output_model() {
     // scores->set_friendly_name("param_2");
     // scores->get_output_tensor(0).set_names({"input_tensor_2"});
     auto max_output_boxes_per_class = ov::op::v0::Constant::create(ov::element::i64, ov::Shape{}, {10});
-    auto iou_threshold = ov::op::v0::Constant::create(ov::element::f32, ov::Shape{}, {0.75});
-    auto score_threshold = ov::op::v0::Constant::create(ov::element::f32, ov::Shape{}, {0.7});
+    auto iou_threshold = ov::op::v0::Constant::create(ov::element::f32, ov::Shape{}, {0.5});
+    auto score_threshold = ov::op::v0::Constant::create(ov::element::f32, ov::Shape{}, {0.5});
     auto nms = std::make_shared<ov::op::v9::NonMaxSuppression>(boxes,
                                                                scores,
                                                                max_output_boxes_per_class,
