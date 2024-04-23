@@ -12,7 +12,7 @@
             //"program": "${workspaceFolder}/build/hello_openvino",
             "program": "${workspaceFolder}/build/hello_single_infer",
             "args": [
-                "CPU",
+                "GPU",
                 "/home/wy/models/input_tesnor_names_changed.xml",
             ],
             "stopAtEntry": false,

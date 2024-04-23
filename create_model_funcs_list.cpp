@@ -83,3 +83,12 @@ std::shared_ptr<ov::Model> create_dynamic_output_model() {
     res->set_friendly_name("output_dynamic");
     return std::make_shared<ov::Model>(ov::NodeVector{nms}, ov::ParameterVector{boxes});
 }
+
+std::shared_ptr<ov::Model> create_test_model() {
+    auto param = std::make_shared<ov::op::v0::Parameter>(ov::element::string, ov::PartialShape{3, -1});
+    param->set_friendly_name("input");
+    auto result = std::make_shared<ov::op::v0::Result>(param);
+    result->set_friendly_name("res");
+    auto model = std::make_shared<ov::Model>(ov::ResultVector{result}, ov::ParameterVector{param});
+    return model;
+}

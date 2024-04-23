@@ -11,3 +11,5 @@ std::shared_ptr<ov::Model> create_dynamic_model(const std::string save_path = ""
 
 //Create the dynamic output model
 std::shared_ptr<ov::Model> create_dynamic_output_model();
+
+std::shared_ptr<ov::Model> create_test_model();
