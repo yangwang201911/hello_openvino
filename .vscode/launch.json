@@ -12,8 +12,8 @@
             //"program": "${workspaceFolder}/build/hello_openvino",
             "program": "${workspaceFolder}/build/hello_single_infer",
             "args": [
-                "CPU",
-                "/home/wy/models/input_tesnor_names_changed.xml",
+                "GPU",
+                "~/models/public/vehicle-license-plate-detection-barrier-0123/FP16/vehicle-license-plate-detection-barrier-0123.xml",
             ],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",

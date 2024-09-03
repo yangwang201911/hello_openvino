@@ -2,7 +2,9 @@
     "clang-format.executable": "/usr/bin/clang-format-9",
     "cmake.configureSettings": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "OpenVINO_DIR": "/opt/intel/openvino_master/runtime/cmake/",
+        "OpenVINO_DIR": "/home/wy/openvino/build",
+        //"OpenVINO_DIR": "~/ov_install/ov_install_PR25025/runtime/cmake",
+        
     },
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "files.associations": {
