@@ -16,6 +16,8 @@ int main(int argc, char* argv[]) {
     ov::Core core;
     std::cout << ov::get_openvino_version() << std::endl;
     auto supported_properties = core.get_property(device_name, ov::supported_properties);
+    std::string device_luid = core.get_property(device_name, ov::device::luid.name()).as<std::string>();
+    std::cout << "Device LUID: " << device_luid << std::endl;
     std::cout << "====== Device properties: " << device_name << "======" << std::endl;
     for (const auto& cfg : supported_properties) {
         if (cfg == ov::supported_properties)

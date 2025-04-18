@@ -83,7 +83,8 @@
       "*.inc": "cpp",
       "any": "cpp",
       "cfloat": "cpp",
-      "climits": "cpp"
+      "climits": "cpp",
+      "bit": "cpp"
     },
       // The prefix that is used for each comment line except for first and last.
   "doxdocgen.c.commentPrefix": " * ",
