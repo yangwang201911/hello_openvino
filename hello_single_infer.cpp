@@ -8,6 +8,29 @@
 #include "openvino/op/matmul.hpp"
 #include "openvino/op/transpose.hpp"
 
+void print_2x2_matrix(const float* matrix, const std::string& name) {
+    std::cout << name << " (2x2):" << std::endl;
+    std::cout << "[[" << std::setw(8) << std::fixed << std::setprecision(1) 
+              << matrix[0] << ", " << std::setw(8) << matrix[1] << "]," << std::endl;
+    std::cout << " [" << std::setw(8) << matrix[2] << ", " << std::setw(8) 
+              << matrix[3] << "]]" << std::endl;
+}
+
+std::shared_ptr<ov::Model> create_2x2_matmul_model() {
+    // Create input parameters for 2x2 matrices
+    auto input1_param = std::make_shared<ov::op::v0::Parameter>(ov::element::f32, ov::Shape{2, 2});
+    auto input2_param = std::make_shared<ov::op::v0::Parameter>(ov::element::f32, ov::Shape{2, 2});
+    
+    // Create MatMul operation (no transpose)
+    auto matmul_op = std::make_shared<ov::op::v0::MatMul>(input1_param, input2_param, false, false);
+
+    // Create model (using the same pattern as model_multiply.cpp)
+    auto model = std::make_shared<ov::Model>(ov::NodeVector{matmul_op}, 
+                                             std::vector<std::shared_ptr<ov::op::v0::Parameter>>{input1_param, input2_param});
+
+    return model;
+}
+
 // 随机生成输入数据
 std::vector<float> generate_random_data(size_t size) {
     std::vector<float> data(size);
@@ -108,32 +131,46 @@ void test_allowed_transpose_orders_with_matmul_and_inference(const std::vector<i
     std::cout << std::endl;
 }
 
+void test_matmul_overflow_inference() {
+    // 定义输入张量的形状和数据类型
+    ov::element::Type model_type = ov::element::f32;
+    auto model = create_2x2_matmul_model();
+
+    // 编译模型
+    ov::Core core;
+    auto compiled_model = core.compile_model(model, "GPU", {{"ACTIVATIONS_SCALE_FACTOR", 8}, {"INFERENCE_PRECISION_HINT", "FP16"}});
+    std::cout << "Model compiled successfully for GPU with FP16 precision." << std::endl;
+
+    auto runtime_model = compiled_model.get_runtime_model();
+    // save to local
+    ov::save_model(runtime_model, "exported_matmul_model.xml");
+
+    // 创建推理请求
+    auto infer_request = compiled_model.create_infer_request();
+
+    // 准备输入数据
+    std::vector<float> input_a_data = {400.0f, 400.0f, 400.0f, 1.0f};  // 输入 A 的数据
+    std::vector<float> input_b_data = {240.0f, 240.0f, 240.0f, 1.0f};  // 输入 B 的数据
+
+    // 设置输入数据
+    infer_request.set_input_tensor(0, ov::Tensor(model_type, ov::Shape{2, 2}, input_a_data.data()));
+    infer_request.set_input_tensor(1, ov::Tensor(model_type, ov::Shape{2, 2}, input_b_data.data()));
+
+    print_2x2_matrix(input_a_data.data(), "Input A");
+    print_2x2_matrix(input_b_data.data(), "Input B");
+    // 执行推理
+    infer_request.infer();
+    std::cout << "Inference completed successfully." << std::endl;
+
+    // 获取输出数据
+    auto output_tensor = infer_request.get_output_tensor(0);
+    auto output_data = output_tensor.data<float>();
+
+    // 打印输出数据的前几个值（用于验证）
+    print_2x2_matrix(output_data, "Output data after matmul");
+}
+
 int main() {
-    // 定义 allowed_orders 中的转置顺序
-    const std::vector<std::vector<int64_t>> allowed_orders = {
-        {0, 3, 1, 2},
-
-        {0, 1, 2, 3},
-        {0, 1, 3, 2},
-        {1, 2, 3, 0},
-        {0, 2, 1, 3},
-
-
-        {1, 2, 0, 3},
-    };
-    for (auto& order : allowed_orders) {
-        std::cout << "===== Testing transpose order: ";
-        for (auto dim : order) {
-            std::cout << dim << " ";
-        }
-        std::cout << std::endl;
-
-        try {
-            test_allowed_transpose_orders_with_matmul_and_inference(order);
-            std::cout << "PASS\n" << std::endl;
-        } catch (const std::exception& e) {
-            std::cerr << "Test failed: " << e.what() << std::endl;
-        }
-    }
+    test_matmul_overflow_inference();
     return 0;
 }
