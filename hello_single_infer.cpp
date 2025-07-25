@@ -8,6 +8,11 @@
 #include "openvino/op/matmul.hpp"
 #include "openvino/op/transpose.hpp"
 
+// 前向声明OpenVINO的disable_fp16_compression函数
+namespace ov {
+    void disable_fp16_compression(const std::shared_ptr<Node>& node);
+}
+
 void print_2x2_matrix(const float* matrix, const std::string& name) {
     std::cout << name << " (2x2):" << std::endl;
     std::cout << "[[" << std::setw(8) << std::fixed << std::setprecision(1) 
@@ -23,6 +28,14 @@ std::shared_ptr<ov::Model> create_2x2_matmul_model() {
     
     // Create MatMul operation (no transpose)
     auto matmul_op = std::make_shared<ov::op::v0::MatMul>(input1_param, input2_param, false, false);
+    
+    // 禁用MatMul操作的FP16压缩，强制保持FP32精度
+    try {
+        ov::disable_fp16_compression(matmul_op);
+        std::cout << "Successfully called disable_fp16_compression" << std::endl;
+    } catch (const std::exception& e) {
+        std::cout << "Error calling disable_fp16_compression: " << e.what() << std::endl;
+    }
 
     // Create model (using the same pattern as model_multiply.cpp)
     auto model = std::make_shared<ov::Model>(ov::NodeVector{matmul_op}, 
@@ -131,14 +144,22 @@ void test_allowed_transpose_orders_with_matmul_and_inference(const std::vector<i
     std::cout << std::endl;
 }
 
-void test_matmul_overflow_inference() {
+void test_matmul_overflow_inference(const std::string& model_path) {
     // 定义输入张量的形状和数据类型
     ov::element::Type model_type = ov::element::f32;
-    auto model = create_2x2_matmul_model();
+    std::shared_ptr<ov::Model> model;
+    if (model_path.empty()) {
+        std::cout << "Model path is empty, using default model creation." << std::endl;
+        model = create_2x2_matmul_model();
+    } else {
+        std::cout << "Using provided model path: " << model_path << std::endl;
+        model = ov::Core().read_model(model_path);
+    }
+    //ov::save_model(model, "exported_original_matmul_model_enable_fp16_compress.xml");
 
     // 编译模型
     ov::Core core;
-    auto compiled_model = core.compile_model(model, "GPU", {{"ACTIVATIONS_SCALE_FACTOR", 8}, {"INFERENCE_PRECISION_HINT", "FP16"}});
+    auto compiled_model = core.compile_model(model, "GPU", {{"INFERENCE_PRECISION_HINT", "FP16"}});
     std::cout << "Model compiled successfully for GPU with FP16 precision." << std::endl;
 
     auto runtime_model = compiled_model.get_runtime_model();
@@ -170,7 +191,8 @@ void test_matmul_overflow_inference() {
     print_2x2_matrix(output_data, "Output data after matmul");
 }
 
-int main() {
-    test_matmul_overflow_inference();
+int main(int argc, char**argv) {
+    std::string model = argc > 1 ? argv[1] : "";
+    test_matmul_overflow_inference(model);
     return 0;
 }
