@@ -192,6 +192,32 @@ void test_matmul_overflow_inference(const std::string& model_path) {
 }
 
 int main(int argc, char**argv) {
+    // 定义 allowed_orders 中的转置顺序
+    //const std::vector<std::vector<int64_t>> allowed_orders = {
+    //    {0, 3, 1, 2},
+
+    //    {0, 1, 2, 3},
+    //    {0, 1, 3, 2},
+    //    {1, 2, 3, 0},
+    //    {0, 2, 1, 3},
+
+
+    //    {1, 2, 0, 3},
+    //};
+    //for (auto& order : allowed_orders) {
+    //    std::cout << "===== Testing transpose order: ";
+    //    for (auto dim : order) {
+    //        std::cout << dim << " ";
+    //    }
+    //    std::cout << std::endl;
+
+    //    try {
+    //        test_allowed_transpose_orders_with_matmul_and_inference(order);
+    //        std::cout << "PASS\n" << std::endl;
+    //    } catch (const std::exception& e) {
+    //        std::cerr << "Test failed: " << e.what() << std::endl;
+    //    }
+    //}
     std::string model = argc > 1 ? argv[1] : "";
     test_matmul_overflow_inference(model);
     return 0;

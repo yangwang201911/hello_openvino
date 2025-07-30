@@ -5,16 +5,116 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python C++ Debugger",
+            "type": "pythoncpp",
+            "request": "launch",
+            "pythonLaunchName": "Python: Current File",
+            "cppAttachName": "(gdb) Attach"
+        },
+        {
+            "name": "Python: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/bin/intel64/Debug/python"
+            },
+            //"program": "/home/wy/debug_20250324_dyn_shape.py",
+            "program": "${file}",
+            "envFile": "${workspaceFolder}/.env",
+            "args": ["-m", "~/models/public/vehicle-license-plate-detection-barrier-0123/FP16/vehicle-license-plate-detection-barrier-0123.xml",
+                    "-d", "AUTO",
+                    "-t", "2", "-nireq", "1", "-hint", "latency"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false 
+        },
+        {
+            "name": "(gdb) Attach",
+            "type": "cppdbg",
+            "request": "attach",
+            "program": "/usr/bin/python3",
+            "processId": "${command:pickProcess}",
+            "MIMode": "gdb",
+            //"additionalSOLibSearchPath": "${workspaceFolder}/bin/intel64/Debug/",// adder_plus.so in current folder
+            "targetArchitecture": "x86_64",
+            "logging": { "engineLogging": true, "traceResponse": true
+            },//show gdb log
+            "setupCommands": [
+              {
+                "description": "Enable pretty-printing for gdb",
+                "text": "-enable-pretty-printing",
+                "ignoreFailures": true
+              }
+            ]
+        },
+        {
+            "name": "(gdb) python",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            //"args": ["-m", "~/models/public/vehicle-license-plate-detection-barrier-0123/FP16/vehicle-license-plate-detection-barrier-0123.xml",
+            //        "-d", "AUTO:GPU,CPU",
+            //        "-t", "2",
+            //        "-load_config", "~/wangyang_py_test.json"
+            //],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/bin/intel64/Debug/python_api/python3.6/"
+            },
+            "justMyCode": false
+        },
+        {
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            //"program": "${workspaceFolder}/build/auto_test",
-            "program": "${workspaceFolder}/build/hello_world",
-            //"program": "${workspaceFolder}/build/hello_single_infer",
+            //"program": "${workspaceFolder}/bin/intel64/Debug/ov_gpu_func_tests",
+            //"args": ["--gtest_filter=*TransposeMatmulFuseTes*"],
+            //"program": "${workspaceFolder}/bin/intel64/Debug/ov_gpu_unit_tests",
+            //"args": ["--gtest_filter=*TranposeMatmulFusion9*"],
+            //"program": "${workspaceFolder}/bin/intel64/Debug/gpuFuncTests",
+            //"args": ["--gtest_filter=*smoke_ConvolutionLayerGPUTest_3D_tensor_basic/ConvolutionLayerGPUTest*CompareWithRefs*"],
+            //"program": "${workspaceFolder}/bin/intel64/Debug/ov_inference_functional_tests",
+            //"args": ["--gtest_filter=*CachingTest/CachingTest.LoadAUTO_OneDeviceNoImportExport/ByModelName_testCache*"],
+            //"program": "${workspaceFolder}/bin/intel64/Debug/ov_inference_functional_tests",
+            //"args": ["--gtest_filter=*CachingTest/CachingTest.LoadAUTO_OneDeviceNoImportExport/ByModelName_testCache*"],
+            //"program": "${workspaceFolder}/bin/intel64/Debug/ov_auto_unit_tests",
+            //"args": ["--gtest_filter=*smoke_AutoRuntimeFallback/AutoRuntimeFallback.releaseResource/auto_runtime_fallback_GPU.0_true_GPU.1_true_OTHER_false_enableRuntimeFallback*"],
+            //"args":["--gtest_filter=*smoke_Auto_BehaviorTests_GetDeviceListWithID/GetDeviceListTest.GetDeviceListTestWithExcludeList/priorityDevices_GPU*0*GPU_expectedDevices_GPU*0_expectedCallAvailableTimes_0_availableDevicesList_CPU_GPU*0_GPU*1_NPU*"],
+            //"args": ["--gtest_filter=*StatefulModelSupportedTest.CanFilterOutCorrectTargetDeviceWithStatefulModel*"],
+            //"program": "${workspaceFolder}/bin/intel64/Debug/ov_auto_func_tests",
+            //"args": ["--gtest_filter=*AutoFuncTests.load_model_path_to_actual_device_and_disable_CPU_accelerating_default_startup_fallback*"],
+            "program": "${workspaceFolder}/bin/intel64/Debug/benchmark_app",
             "args": [
+                "-m", 
+                "~/models/public/yolo-v4-tf/FP32/yolo-v4-tf.xml",
+                //"~/models/llm/OV_FP16-INT8_ASYM/FP16/openvino_model.xml",
+                "-d",
                 "AUTO:GPU,CPU",
-                "~/models/eye_medium_new.xml",
+                "-hint",
+                "tput",
+                "-niter",
+                "1000",
+                "-cache_dir",
+                "~/yang_test_cache_dir",
+                "-b",
+                "1",
+                "-load_config",
+                "${workspaceFolder}/bin/intel64/Debug/config.json",
+                //"-data_shape",
+                //"input_ids[5,20],attention_mask[5,20],position_ids[5,20],beam_idx[10]",
             ],
+            //"program": "${workspaceFolder}/bin/intel64/Debug/myriadFuncTests",
+            //"args": [
+            //    //"--gtest_filter=*smoke_CPU_OVClassLoadNetworkWithCorrectSecondaryPropertiesTest/OVClassLoadNetworkWithCorrectPropertiesTest*LoadNetworkWithCorrectPropertiesTest/2*"
+            //    "--gtest_filter=*smoke_Multi_BehaviorTests/IncorrectConfigTests*SetConfigWithIncorrectKey*"
+            //],
+            //"program": "${workspaceFolder}/bin/intel64/Debug/hello_classification",
+            //"args": [
+            //    "~/models/public/vgg16/FP32/vgg16.xml",
+            //    "~/white_car.jpg",
+            //    "AUTO:GPU,CPU"
+            //],
+            //"program": "${workspaceFolder}/bin/intel64/Debug/ov_auto_unit_tests",
+            //"args": ["--gtest_filter=*smoke_Auto_BehaviorTests/KeyNetworkPriorityTest.SelectDevice/_enableDevicePriority_false_priority_0_return_dGPU_01_priority_1_return_iGPU_01_priority_2_return_CPU_01_priority_2_return_CPU_01netPrecision_FP32*"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [{"name": "OPENVINO_LOG_LEVEL", "value": "7"}],
