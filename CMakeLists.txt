@@ -1,22 +1,22 @@
 cmake_minimum_required(VERSION 3.16)
 project(hello_openvino)
 set(SOURCE_FILES_HELLO_WORLD
-    hello_world.cpp
-    create_model_funcs_list.hpp
-    create_model_funcs_list.cpp
+    cpp/hello_world.cpp
+    cpp/create_model_funcs_list.hpp
+    cpp/create_model_funcs_list.cpp
 )
 
 set(SOURCE_MULTI_INFER_FILES
-    multi_threads_infer_on_multi_device.cpp
+    cpp/multi_threads_infer_on_multi_device.cpp
 )
 
 set(SOURCE_SINGLE_INFER_FILES
-    hello_single_infer.cpp
-    create_model_funcs_list.cpp
+    cpp/hello_single_infer.cpp
+    cpp/create_model_funcs_list.cpp
 )
 
 set(SOURCE_AUTO_TEST
-    auto_test.cpp
+    cpp/auto_test.cpp
 )
 find_package(OpenVINO REQUIRED)
 add_executable(hello_world ${SOURCE_FILES_HELLO_WORLD})
